@@ -1,7 +1,6 @@
-import React from 'react';
-import Link from 'next/link';
-// import Image from 'next/image';
-// import { FaEnvelope, FaLock } from 'react-icons/fa';
+import React from "react";
+import Link from "next/link";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
 const Login = () => {
   return (
@@ -10,11 +9,14 @@ const Login = () => {
         <h2 className="text-2xl font-bold text-center">Log In</h2>
         <form className="mt-6">
           <div className="mb-4">
-            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
-              {/* <FaEnvelope className="text-gray-400" /> */}
+              <FaEnvelope className="text-gray-400" />
               <input
                 type="email"
                 id="email"
@@ -25,11 +27,14 @@ const Login = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
-              {/* <FaLock className="text-gray-400" /> */}
+              <FaLock className="text-gray-400" />
               <input
                 type="password"
                 id="password"
@@ -46,10 +51,10 @@ const Login = () => {
             Log In
           </button>
         </form>
-        <p className="mt-4 text-sm text-center">
-          Don’t have an account?{' '}
-          <Link href="/signup">
-            {/* <a className="text-blue-600 hover:underline">Sign Up</a> */}
+        <p className="mt-4 py-0.5 text-sm text-center">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="text-blue-600 hover:underline">
+            Sign Up
           </Link>
         </p>
       </div>

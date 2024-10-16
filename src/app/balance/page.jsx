@@ -1,17 +1,13 @@
 "use client";
 
 import React, { useState } from 'react';
-import Navbar from './Components/Navbar';
+import Navbar from '../Components/Navbar';
 
-export default function Home() {
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [timestamp, setTimestamp] = useState(null);
+const Balance = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [balance] = useState(1234); // Sample balance value
 
-  const handleCheckInOut = () => {
-    const currentTime = new Date().toLocaleString();
-    setTimestamp(currentTime);
-    setIsCheckedIn(!isCheckedIn);
+  const handleCheckBalance = () => {
     setShowPopup(true);
   };
 
@@ -23,7 +19,7 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
       <div className="container mx-auto p-8 flex items-center justify-center">
-        <div className="bg-gray-200 p-8 m-10 rounded-lg w-full max-w-2xl text-center">
+        <div className="bg-gray-200 p-8 rounded-lg w-full max-w-2xl text-center">
           <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center">
             {/* Placeholder for image */}
             <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -31,13 +27,12 @@ export default function Home() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10a4 4 0 100 8 4 4 0 000-8z"></path>
             </svg>
           </div>
-          <h2 className="text-xl font-bold mb-2">Mr. Pakkhapol Saekow</h2>
-          <p className="text-gray-600 mb-6">{timestamp ? timestamp : 'No Check In/Out'}</p>
+          <h2 className="text-3xl font-bold mb-6">Balance</h2>
           <button 
-            onClick={handleCheckInOut}
+            onClick={handleCheckBalance}
             className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
           >
-            {isCheckedIn ? 'Check Out' : 'Check In'}
+            Check Balance
           </button>
         </div>
       </div>
@@ -51,13 +46,13 @@ export default function Home() {
             >
               &times;
             </button>
-            <h2 className="text-2xl font-bold mb-4">
-              {isCheckedIn ? 'You have checked out' : 'You have checked in'}
-            </h2>
-            <p className="text-gray-600">{timestamp}</p>
+            <h2 className="text-2xl font-bold mb-4">Your balance</h2>
+            <p className="text-gray-600">{balance} Baht</p>
           </div>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default Balance;
