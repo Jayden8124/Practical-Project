@@ -1,63 +1,65 @@
-"use client";
+import React from "react";
+import Link from "next/link";
+import { FaEnvelope, FaLock } from "react-icons/fa";
 
-import React, { useState } from 'react';
-import Navbar from './Components/Navbar';
-
-export default function Home() {
-  const [isCheckedIn, setIsCheckedIn] = useState(false);
-  const [timestamp, setTimestamp] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
-
-  const handleCheckInOut = () => {
-    const currentTime = new Date().toLocaleString();
-    setTimestamp(currentTime);
-    setIsCheckedIn(!isCheckedIn);
-    setShowPopup(true);
-  };
-
-  const handleClosePopup = () => {
-    setShowPopup(false);
-  };
-
+const Login = () => {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar />
-      <div className="container mx-auto p-8 flex items-center justify-center">
-        <div className="bg-gray-200 p-8 m-10 rounded-lg w-full max-w-2xl text-center">
-          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center">
-            {/* Placeholder for image */}
-            <svg className="w-16 h-16 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"></path>
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10a4 4 0 100 8 4 4 0 000-8z"></path>
-            </svg>
-          </div>
-          <h2 className="text-xl font-bold mb-2">Mr. Pakkhapol Saekow</h2>
-          <p className="text-gray-600 mb-6">{timestamp ? timestamp : 'No Check In/Out'}</p>
-          <button 
-            onClick={handleCheckInOut}
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
-          >
-            {isCheckedIn ? 'Check Out' : 'Check In'}
-          </button>
-        </div>
-      </div>
-
-      {showPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative">
-            <button
-              onClick={handleClosePopup}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
+        <h2 className="text-2xl font-bold text-center">Log In</h2>
+        <form className="mt-6">
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700"
             >
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold mb-4">
-              {isCheckedIn ? 'You have checked out' : 'You have checked in'}
-            </h2>
-            <p className="text-gray-600">{timestamp}</p>
+              Email
+            </label>
+            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+              <FaEnvelope className="text-gray-400" />
+              <input
+                type="email"
+                id="email"
+                placeholder="Enter your email"
+                className="w-full px-2 py-2 focus:outline-none"
+              />
+            </div>
           </div>
-        </div>
-      )}
+
+          <div className="mb-4">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
+            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+              <FaLock className="text-gray-400" />
+              <input
+                type="password"
+                id="password"
+                placeholder="Enter your password"
+                className="w-full px-2 py-2 focus:outline-none"
+              />
+            </div>
+          </div>
+
+          <button
+            type="submit"
+            className="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none"
+          >
+            Log In
+          </button>
+        </form>
+        <p className="mt-4 py-0.5 text-sm text-center">
+          Don’t have an account?{" "}
+          <Link href="/signup" className="text-blue-600 hover:underline">
+            Sign Up
+          </Link>
+        </p>
+      </div>
     </div>
   );
-}
+};
+
+export default Login;

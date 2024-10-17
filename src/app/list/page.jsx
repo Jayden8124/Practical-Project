@@ -8,6 +8,7 @@ const ToDoList = () => {
   const [isManaging, setIsManaging] = useState(false);
   const [showAddTaskPopup, setShowAddTaskPopup] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
+  const [editTaskIndex, setEditTaskIndex] = useState(null);
 
   const handleCheckboxChange = (index) => {
     const newTasks = [...tasks];
@@ -26,22 +27,26 @@ const ToDoList = () => {
   const handleCloseAddTaskPopup = () => {
     setShowAddTaskPopup(false);
     setNewTaskName("");
+    setEditTaskIndex(null);
   };
 
   const handleAddTask = () => {
     if (newTaskName) {
-      setTasks([...tasks, { name: newTaskName, completed: false }]);
+      if (editTaskIndex !== null) {
+        const updatedTasks = [...tasks];
+        updatedTasks[editTaskIndex].name = newTaskName;
+        setTasks(updatedTasks);
+      } else {
+        setTasks([...tasks, { name: newTaskName, completed: false }]);
+      }
       handleCloseAddTaskPopup();
     }
   };
 
   const handleEditTask = (index) => {
-    const newTaskName = prompt("Edit task:", tasks[index].name);
-    if (newTaskName) {
-      const newTasks = [...tasks];
-      newTasks[index].name = newTaskName;
-      setTasks(newTasks);
-    }
+    setNewTaskName(tasks[index].name);
+    setEditTaskIndex(index);
+    setShowAddTaskPopup(true);
   };
 
   const handleDeleteTask = (index) => {
@@ -59,37 +64,39 @@ const ToDoList = () => {
           {tasks.length === 0 ? (
             <p className="italic text-gray-400 mb-6">No tasks yet. Add one to get started!</p>
           ) : (
-            <ul className="space-y-6 mb-6">
+            <ul className="space-y-6 mb-6 w-full">
               {tasks.map((task, index) => (
-                <li key={index} className="flex items-center text-lg">
-                  <input
-                    type="checkbox"
-                    className="mr-4"
-                    checked={task.completed}
-                    onChange={() => handleCheckboxChange(index)}
-                  />
-                  <span
-                    className={`${
-                      task.completed ? "line-through text-gray-500" : ""
-                    }`}
-                  >
-                    {task.name}
-                  </span>
+                <li key={index} className="flex items-center justify-between w-full text-lg">
+                  <div className="flex items-center">
+                    <input
+                      type="checkbox"
+                      className="mr-4"
+                      checked={task.completed}
+                      onChange={() => handleCheckboxChange(index)}
+                    />
+                    <span
+                      className={`${
+                        task.completed ? "line-through text-gray-500" : ""
+                      }`}
+                    >
+                      {task.name}
+                    </span>
+                  </div>
                   {isManaging && (
-                    <>
+                    <div className="ml-auto flex space-x-2">
                       <button
                         onClick={() => handleEditTask(index)}
-                        className="ml-4 text-blue-500"
+                        className="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteTask(index)}
-                        className="ml-2 text-red-500"
+                        className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
                       >
                         Delete
                       </button>
-                    </>
+                    </div>
                   )}
                 </li>
               ))}
@@ -141,7 +148,9 @@ const ToDoList = () => {
             >
               &times;
             </button>
-            <h2 className="text-2xl font-bold mb-4">Add New Task</h2>
+            <h2 className="text-2xl font-bold mb-4">
+              {editTaskIndex !== null ? "Edit Task" : "Add New Task"}
+            </h2>
             <input
               type="text"
               value={newTaskName}
@@ -153,7 +162,7 @@ const ToDoList = () => {
               onClick={handleAddTask}
               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
             >
-              Add Task
+              {editTaskIndex !== null ? "Save Changes" : "Add Task"}
             </button>
           </div>
         </div>
