@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Navbar from "../Components/Navbar";
 
 const ToDoList = () => {
   const [tasks, setTasks] = useState([]);
@@ -56,7 +55,7 @@ const ToDoList = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
+      {/* <Navbar /> */}
       <div className="container mx-auto p-8">
         <h1 className="text-3xl font-bold mb-4">To-Do List</h1>
         <div className="border-b border-gray-300 mb-6"></div>

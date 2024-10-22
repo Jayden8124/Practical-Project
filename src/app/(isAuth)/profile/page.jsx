@@ -1,8 +1,8 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import Navbar from "../Components/Navbar";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import axios from "axios";
 
 const Profile = () => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -11,9 +11,45 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showEditImagePopup, setShowEditImagePopup] = useState(false);
   const [profileImage, setProfileImage] = useState("/default-profile.png");
-  const [totalIncome, setTotalIncome] = useState(() => {
-    return parseFloat(localStorage.getItem("totalIncome") || "0");
-  });
+  const [totalIncome, setTotalIncome] = useState(0);
+  const [userData, setUserData] = useState(null);
+  const [checkInOutHistory, setCheckInOutHistory] = useState([]);
+
+  useEffect(() => {
+    // Fetch user profile data
+    async function fetchUserData() {
+      try {
+        const email = localStorage.getItem("userEmail");
+        const password = localStorage.getItem("userPassword");
+        if (email && password) {
+          const response = await axios.post("http://localhost:5000/user", {
+            email,
+            password,
+          });
+          if (response.data) {
+            setUserData(response.data);
+            setProfileImage(response.data.profileImage || "/default-profile.png");
+            setTotalIncome(response.data.total);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    }
+
+    // Fetch check-in/out history
+    async function fetchCheckInOutHistory() {
+      try {
+        const response = await axios.get("http://localhost:5000/history");
+        setCheckInOutHistory(response.data);
+      } catch (error) {
+        console.error("Error fetching check-in/out history: ", error);
+      }
+    }
+
+    fetchUserData();
+    fetchCheckInOutHistory();
+  }, []);
 
   const handleEditPassword = () => {
     setShowPasswordPopup(true);
@@ -26,13 +62,31 @@ const Profile = () => {
     setConfirmPassword("");
   };
 
-  const handleSavePassword = () => {
+  const handleSavePassword = async () => {
     if (newPassword === confirmPassword) {
-      // Save password logic here
-      handleClosePasswordPopup();
+      try {
+        await axios.put("http://localhost:5000/user", {
+          newPassword
+        });
+        handleClosePasswordPopup();
+      } catch (error) {
+        console.error("Error saving password: ", error);
+        alert("Failed to update password");
+      }
     } else {
       alert("New password and confirm password do not match");
     }
+  };
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return (
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      "-" +
+      date.getFullYear()
+    );
   };
 
   const handleEditImage = () => {
@@ -43,26 +97,35 @@ const Profile = () => {
     setShowEditImagePopup(false);
   };
 
-  const handleSaveImage = (e) => {
+  const handleSaveImage = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const formData = new FormData();
+      formData.append("profileImage", file);
+
+      try {
+        const response = await axios.put("http://localhost:5000/user", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        setProfileImage(response.data.profileImage);
+      } catch (error) {
+        console.error("Error saving profile image: ", error);
+        alert("Failed to update profile image");
+      }
     }
     handleCloseEditImagePopup();
   };
-  
-  
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center">
-      <Navbar />
       <div className="container mx-auto p-8 text-center">
         <div className="flex flex-col items-center">
           <div className="w-full md:w-1/3 flex flex-col items-center">
-            <h2 className="text-2xl font-bold mb-5">PAKKHAPHON SAEKOW</h2>
+            <h2 className="text-2xl font-bold mb-5">
+              {userData ? `${userData.firstName} ${userData.lastName}` : "Loading..."}
+            </h2>
 
             <div className="w-40 h-40 bg-gray-300 rounded-full mb-4 overflow-hidden flex items-center justify-center">
               <Image
@@ -84,50 +147,47 @@ const Profile = () => {
             <div className="mx-auto mt-8 text-center">
               <div className="border-b-2 border-gray-300 my-6"></div>
               <h3 className="text-3xl font-semibold mb-6">About</h3>
-              <ul className="space-y-4">
-                <li>
-                  <span className="font-semibold">First name: </span>Pakkhapol
-                </li>
-                <li>
-                  <span className="font-semibold">Last name: </span>Saekow
-                </li>
-                <li>
-                  <span className="font-semibold">Phone number: </span>
-                  063-020-7740
-                </li>
-                <li>
-                  <span className="font-semibold">Date of birth: </span>
-                  06-12-2003
-                </li>
-                <li>
-                  <span className="font-semibold">Start date: </span>xxxx
-                </li>
-                <li>
-                  <span className="font-semibold">Rate: </span>80 Baht/Hrs
-                </li>
-                <li>
-                  <span className="font-semibold">Total income: </span>
-                  {totalIncome} Baht
-                </li>
-                <li>
-                  <span className="font-semibold">Email: </span>
-                  Pakkhapol2444@gmail.com
-                </li>
-                <li className="flex items-center justify-center">
-                  <span className="font-semibold">Password: </span>
-                  <span className="ml-2">1234578</span>
-                  <button
-                    onClick={handleEditPassword}
-                    className="ml-4 text-blue-500 hover:underline"
-                  >
-                    Edit
-                  </button>
-                </li>
-              </ul>
+              {userData ? (
+                <ul className="space-y-4">
+                  <li>
+                    <span className="font-semibold">First name: </span>{userData.firstName}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Last name: </span>{userData.lastName}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Phone number: </span>{userData.phone}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Date of birth: </span>{formatDate(userData.birth)}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Start date: </span>{formatDate(userData.startDate)}
+                  </li>
+                  <li>
+                    <span className="font-semibold">Rate: </span>{userData.rate} Baht/Hrs
+                  </li>
+                  <li>
+                    <span className="font-semibold">Total income: </span>{userData.total} Baht
+                  </li>
+                  <li>
+                    <span className="font-semibold">Email: </span>{userData.email}
+                  </li>
+                  <li className="flex items-center justify-center">
+                    <span className="font-semibold">Password: ******</span>
+                    <button
+                      onClick={handleEditPassword}
+                      className="ml-4 text-blue-500 hover:underline"
+                    >
+                      Edit
+                    </button>
+                  </li>
+                </ul>
+              ) : (
+                <p>Loading user data...</p>
+              )}
               <div className="border-b-2 border-gray-300 my-6"></div>
-              <h3 className="mt-10 text-3xl font-semibold mb-4">
-                Check In/Out History
-              </h3>
+              <h3 className="mt-10 text-3xl font-semibold mb-4">Check In/Out History</h3>
               <div className="mt-4 max-h-60 overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -137,14 +197,18 @@ const Profile = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {JSON.parse(
-                      localStorage.getItem("checkInOutHistory") || "[]"
-                    ).map((entry, index) => (
-                      <tr key={index}>
-                        <td className="border-b p-2">{entry.action}</td>
-                        <td className="border-b p-2">{entry.timestamp}</td>
+                    {checkInOutHistory.length > 0 ? (
+                      checkInOutHistory.map((entry, index) => (
+                        <tr key={index}>
+                          <td className="border-b p-2">{entry.action}</td>
+                          <td className="border-b p-2">{new Date(entry.timestamp).toLocaleString()}</td>
+                        </tr>
+                      ))
+                    ) : (
+                      <tr>
+                        <td colSpan="2" className="border-b p-2 text-center">No history available</td>
                       </tr>
-                    ))}
+                    )}
                   </tbody>
                 </table>
               </div>

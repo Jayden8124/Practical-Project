@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Navbar from "../Components/Navbar";
-// import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const Balance = () => {
   const [showPopup, setShowPopup] = useState(false);
@@ -11,19 +10,40 @@ const Balance = () => {
   const [checkInTimestamp, setCheckInTimestamp] = useState(null);
   const [currentTimestamp, setCurrentTimestamp] = useState(null);
   const [showNoCheckInPopup, setShowNoCheckInPopup] = useState(false);
-  // const router = useRouter();
+  const [isCheckedIn, setIsCheckedIn] = useState(false);
+  const [userData, setUserData] = useState(null);
 
   useEffect(() => {
-    // Assume fetching rate from profile or API
-    setRate(60);
-    const storedTimestamp = localStorage.getItem("checkInTimestamp");
-    if (storedTimestamp) {
+    const fetchUserData = async () => {
+      try {
+        const email = localStorage.getItem("userEmail");
+        if (email) {
+          const response = await axios.get(`http://localhost:5000/user/${email}`);
+          if (response.data) {
+            setUserData(response.data);
+            setRate(response.data.rate);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+  
+    fetchUserData();
+  
+    const storedIsCheckedIn = localStorage.getItem("isCheckedIn");
+    const storedTimestamp = localStorage.getItem("timestamp");
+    if (storedIsCheckedIn === "true" && storedTimestamp) {
+      setIsCheckedIn(true);
       setCheckInTimestamp(storedTimestamp);
+    } else {
+      setIsCheckedIn(false);
     }
   }, []);
+  
 
   const handleCheckBalance = () => {
-    if (checkInTimestamp) {
+    if (isCheckedIn && checkInTimestamp) {
       const income = calculateIncome(checkInTimestamp);
       setBalance(income);
       setCurrentTimestamp(new Date().toLocaleString());
@@ -51,7 +71,6 @@ const Balance = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar />
       <div className="container mx-auto mt-3 p-8 flex items-center justify-center">
         <div className="bg-gray-200 p-8 rounded-lg w-full max-w-2xl text-center">
           <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center">
@@ -118,7 +137,9 @@ const Balance = () => {
               &times;
             </button>
             <h2 className="text-2xl font-bold mb-4">No Check-In Record</h2>
-            <p className="text-gray-600">Please check in first before checking your balance.</p>
+            <p className="text-gray-600">
+              Please check in first before checking your balance.
+            </p>
           </div>
         </div>
       )}
