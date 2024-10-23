@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Footer from "../../Components/Footer";
+import Image from "next/image";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
@@ -10,6 +11,7 @@ export default function Home() {
   const [timestamp, setTimestamp] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [profileImage, setProfileImage] = useState("/default-profile.png");
   const router = useRouter();
 
   useEffect(() => {
@@ -33,6 +35,11 @@ export default function Home() {
       );
       if (matchedUser) {
         setUserData(matchedUser);
+        setProfileImage(
+          matchedUser.profileImage.startsWith("http")
+            ? matchedUser.profileImage
+            : `http://localhost:5000${matchedUser.profileImage}`
+        );
       } else {
         console.error("User not found");
       }
@@ -84,7 +91,7 @@ export default function Home() {
         await axios.put(`http://localhost:5000/user/${userData.email}`, {
           total: userData.total + income,
           email: userData.email
-        }); 
+        });
       } catch (error) {
         console.error("Error saving income data: ", error);
       }
@@ -93,7 +100,7 @@ export default function Home() {
       try {
         await axios.post("http://localhost:5000/history", {
           action,
-          email: userData.email, // Use the logged-in user's email
+          email: userData.email,
           time: currentTime,
         });
       } catch (error) {
@@ -103,7 +110,7 @@ export default function Home() {
       setIsCheckedIn(false);
       setTimestamp(currentTime);
       localStorage.setItem("isCheckedIn", "false");
-      localStorage.setItem("timestamp", currentTime); // Save check-out timestamp
+      localStorage.setItem("timestamp", currentTime);
     } else {
       // Check In
       setTimestamp(currentTime);
@@ -123,28 +130,15 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="container mx-auto p-8 flex items-center justify-center">
         <div className="bg-gray-200 p-8 rounded-lg w-full max-w-2xl text-center">
-          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center">
-            {/* Placeholder for image */}
-            <svg
-              className="w-16 h-16 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="/assets/jay.jpg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"
-              ></path>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 10a4 4 0 100 8 4 4 0 000-8z"
-              ></path>
-            </svg>
+          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
+            <Image
+              src={profileImage}
+              alt="Profile"
+              className="w-full h-full object-cover"
+              width={150}
+              height={150}
+              loading="eager"
+            />
           </div>
           <h2 className="text-xl font-bold mb-2">
             {userData

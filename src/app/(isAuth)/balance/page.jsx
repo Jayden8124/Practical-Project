@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Image from "next/image";
 import axios from "axios";
 
 const Balance = () => {
@@ -12,6 +13,7 @@ const Balance = () => {
   const [showNoCheckInPopup, setShowNoCheckInPopup] = useState(false);
   const [isCheckedIn, setIsCheckedIn] = useState(false);
   const [userData, setUserData] = useState(null);
+  const [profileImage, setProfileImage] = useState("/default-profile.png");
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -22,15 +24,20 @@ const Balance = () => {
           if (response.data) {
             setUserData(response.data);
             setRate(response.data.rate);
+            setProfileImage(
+              response.data.profileImage.startsWith("http")
+                ? response.data.profileImage
+                : `http://localhost:5000${response.data.profileImage}`
+            );
           }
         }
       } catch (error) {
         console.error("Error fetching user data: ", error);
       }
     };
-  
+
     fetchUserData();
-  
+
     const storedIsCheckedIn = localStorage.getItem("isCheckedIn");
     const storedTimestamp = localStorage.getItem("timestamp");
     if (storedIsCheckedIn === "true" && storedTimestamp) {
@@ -79,28 +86,15 @@ const Balance = () => {
     <div className="min-h-screen bg-gray-50">
       <div className="container mx-auto mt-3 p-8 flex items-center justify-center">
         <div className="bg-gray-200 p-8 rounded-lg w-full max-w-2xl text-center">
-          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center">
-            {/* Placeholder for image */}
-            <svg
-              className="w-16 h-16 text-gray-500"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M3 7a4 4 0 014-4h10a4 4 0 014 4v10a4 4 0 01-4 4H7a4 4 0 01-4-4V7z"
-              ></path>
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M8 10a4 4 0 100 8 4 4 0 000-8z"
-              ></path>
-            </svg>
+          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
+            <Image
+              src={profileImage}
+              alt="Profile"
+              className="w-full h-full object-cover"
+              width={150}
+              height={150}
+              loading="eager"
+            />
           </div>
           <h2 className="text-3xl font-bold mb-6">Balance</h2>
           <button
