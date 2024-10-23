@@ -11,7 +11,7 @@ export default function Home() {
   const [timestamp, setTimestamp] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const [userData, setUserData] = useState(null);
-  const [profileImage, setProfileImage] = useState("/default-profile.png");
+  const [profileImage, setProfileImage] = useState("/assets/test.png");
   const router = useRouter();
 
   useEffect(() => {
@@ -133,7 +133,7 @@ export default function Home() {
           <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
             <Image
               src={profileImage}
-              alt="Profile"
+              alt=""
               className="w-full h-full object-cover"
               width={150}
               height={150}

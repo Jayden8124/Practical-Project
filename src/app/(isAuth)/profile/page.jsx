@@ -10,7 +10,7 @@ const Profile = () => {
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showEditImagePopup, setShowEditImagePopup] = useState(false);
-  const [profileImage, setProfileImage] = useState("/default-profile.png");
+  const [profileImage, setProfileImage] = useState("/assets/no_image.png");
   const [totalIncome, setTotalIncome] = useState(0);
   const [userData, setUserData] = useState(null);
   const [checkInOutHistory, setCheckInOutHistory] = useState([]);
@@ -178,7 +178,7 @@ const Profile = () => {
             <div className="w-40 h-40 bg-gray-300 rounded-full mb-4 overflow-hidden flex items-center justify-center">
               <Image
                 src={profileImage}
-                alt="Profile"
+                alt=""
                 className="w-full h-full object-cover"
                 width={150}
                 height={150}
@@ -234,47 +234,24 @@ const Profile = () => {
                     <span className="font-semibold">Password: ******</span>
                     <button
                       onClick={handleEditPassword}
-                      className="ml-4 text-blue-500 hover:underline"
+                      className="ml-6 text-blue-500 hover:underline"
                     >
                       Edit
+                    </button>
+                  </li>
+                  <li className="flex items-center justify-center">
+                    <span className="font-semibold">History: </span>
+                    <button
+                      onClick={handleEditPassword}
+                      className="ml-2 text-blue-500 hover:underline"
+                    >
+                      Check
                     </button>
                   </li>
                 </ul>
               ) : (
                 <p>Loading user data...</p>
               )}
-              <div className="border-b-2 border-gray-300 my-6"></div>
-              <h3 className="mt-10 text-3xl font-semibold mb-4">
-                Check In/Out History
-              </h3>
-              <div className="mt-4 max-h-60 overflow-y-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr>
-                      <th className="border-b-2 p-2">Action</th>
-                      <th className="border-b-2 p-2">Timestamp</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {checkInOutHistory.length > 0 ? (
-                      checkInOutHistory.map((entry, index) => (
-                        <tr key={index}>
-                          <td className="border-b p-2">{entry.action}</td>
-                          <td className="border-b p-2">
-                            {new Date(entry.timestamp).toLocaleString()}
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan="2" className="border-b p-2 text-center">
-                          No history available
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
             </div>
           </div>
         </div>
