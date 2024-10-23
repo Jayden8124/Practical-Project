@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
@@ -18,12 +17,12 @@ const Profile = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Check for token in local storage
+    const token = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
     const password = localStorage.getItem("userPassword");
 
     if (!token || !email || !password) {
-      router.push("/auth"); // Redirect to login page if not authenticated
+      router.push("/auth");
     } else {
       fetchUserData(email, password);
       fetchCheckInOutHistory(email);
@@ -39,7 +38,11 @@ const Profile = () => {
       );
       if (matchedUser) {
         setUserData(matchedUser);
-        setProfileImage(matchedUser.profileImage || "/default-profile.png");
+        setProfileImage(
+          matchedUser.profileImage.startsWith("http")
+            ? matchedUser.profileImage
+            : `http://localhost:5000${matchedUser.profileImage}`
+        );
         setTotalIncome(matchedUser.total);
       } else {
         console.error("User not found");
@@ -51,7 +54,9 @@ const Profile = () => {
 
   async function fetchCheckInOutHistory(email) {
     try {
-      const response = await axios.get(`http://localhost:5000/history?email=${email}`);
+      const response = await axios.get(
+        `http://localhost:5000/history?email=${email}`
+      );
       setCheckInOutHistory(response.data);
     } catch (error) {
       console.error("Error fetching check-in/out history: ", error);
@@ -90,17 +95,6 @@ const Profile = () => {
     }
   };
 
-  const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return (
-      ("0" + (date.getMonth() + 1)).slice(-2) +
-      "-" +
-      ("0" + date.getDate()).slice(-2) +
-      "-" +
-      date.getFullYear()
-    );
-  };
-
   const handleEditImage = () => {
     setShowEditImagePopup(true);
   };
@@ -118,15 +112,27 @@ const Profile = () => {
 
       try {
         if (email) {
-          const response = await axios.put("http://localhost:5000/user/image", formData, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-            params: {
-              email,
-            },
-          });
-          setProfileImage(response.data.profileImage);
+          const response = await axios.put(
+            "http://localhost:5000/user/image",
+            formData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+              params: {
+                email,
+              },
+            }
+          );
+
+          const updatedProfileImage = response.data.profileImage.startsWith(
+            "http"
+          )
+            ? response.data.profileImage
+            : `http://localhost:5000${response.data.profileImage}`;
+
+          setProfileImage(updatedProfileImage);
+          localStorage.setItem("userProfileImage", updatedProfileImage);
         }
       } catch (error) {
         console.error("Error saving profile image: ", error);
@@ -136,13 +142,37 @@ const Profile = () => {
     handleCloseEditImagePopup();
   };
 
+  useEffect(() => {
+    const savedProfileImage = localStorage.getItem("userProfileImage");
+    if (savedProfileImage) {
+      setProfileImage(
+        savedProfileImage.startsWith("http")
+          ? savedProfileImage
+          : `http://localhost:5000${savedProfileImage}`
+      );
+    }
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return (
+      ("0" + (date.getMonth() + 1)).slice(-2) +
+      "-" +
+      ("0" + date.getDate()).slice(-2) +
+      "-" +
+      date.getFullYear()
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center">
       <div className="container mx-auto p-8 text-center">
         <div className="flex flex-col items-center">
           <div className="w-full md:w-1/3 flex flex-col items-center">
             <h2 className="text-2xl font-bold mb-5">
-              {userData ? `${userData.firstName} ${userData.lastName}` : "Loading..."}
+              {userData
+                ? `${userData.firstName} ${userData.lastName}`
+                : "Loading..."}
             </h2>
 
             <div className="w-40 h-40 bg-gray-300 rounded-full mb-4 overflow-hidden flex items-center justify-center">
@@ -152,6 +182,7 @@ const Profile = () => {
                 className="w-full h-full object-cover"
                 width={150}
                 height={150}
+                loading="eager"
               />
             </div>
             <button
@@ -168,28 +199,36 @@ const Profile = () => {
               {userData ? (
                 <ul className="space-y-4">
                   <li>
-                    <span className="font-semibold">First name: </span>{userData.firstName}
+                    <span className="font-semibold">First name: </span>
+                    {userData.firstName}
                   </li>
                   <li>
-                    <span className="font-semibold">Last name: </span>{userData.lastName}
+                    <span className="font-semibold">Last name: </span>
+                    {userData.lastName}
                   </li>
                   <li>
-                    <span className="font-semibold">Phone number: </span>{userData.phone}
+                    <span className="font-semibold">Phone number: </span>
+                    {userData.phone}
                   </li>
                   <li>
-                    <span className="font-semibold">Date of birth: </span>{formatDate(userData.birth)}
+                    <span className="font-semibold">Date of birth: </span>
+                    {formatDate(userData.birth)}
                   </li>
                   <li>
-                    <span className="font-semibold">Start date: </span>{formatDate(userData.startDate)}
+                    <span className="font-semibold">Start date: </span>
+                    {formatDate(userData.startDate)}
                   </li>
                   <li>
-                    <span className="font-semibold">Rate: </span>{userData.rate} Baht/Hrs
+                    <span className="font-semibold">Rate: </span>
+                    {userData.rate} Baht/Hrs
                   </li>
                   <li>
-                    <span className="font-semibold">Total income: </span>{userData.total} Baht
+                    <span className="font-semibold">Total income: </span>
+                    {userData.total} Baht
                   </li>
                   <li>
-                    <span className="font-semibold">Email: </span>{userData.email}
+                    <span className="font-semibold">Email: </span>
+                    {userData.email}
                   </li>
                   <li className="flex items-center justify-center">
                     <span className="font-semibold">Password: ******</span>
@@ -205,7 +244,9 @@ const Profile = () => {
                 <p>Loading user data...</p>
               )}
               <div className="border-b-2 border-gray-300 my-6"></div>
-              <h3 className="mt-10 text-3xl font-semibold mb-4">Check In/Out History</h3>
+              <h3 className="mt-10 text-3xl font-semibold mb-4">
+                Check In/Out History
+              </h3>
               <div className="mt-4 max-h-60 overflow-y-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
@@ -219,12 +260,16 @@ const Profile = () => {
                       checkInOutHistory.map((entry, index) => (
                         <tr key={index}>
                           <td className="border-b p-2">{entry.action}</td>
-                          <td className="border-b p-2">{new Date(entry.timestamp).toLocaleString()}</td>
+                          <td className="border-b p-2">
+                            {new Date(entry.timestamp).toLocaleString()}
+                          </td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="2" className="border-b p-2 text-center">No history available</td>
+                        <td colSpan="2" className="border-b p-2 text-center">
+                          No history available
+                        </td>
                       </tr>
                     )}
                   </tbody>
