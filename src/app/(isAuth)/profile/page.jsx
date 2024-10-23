@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 const Profile = () => {
   const [showPasswordPopup, setShowPasswordPopup] = useState(false);
@@ -14,42 +15,48 @@ const Profile = () => {
   const [totalIncome, setTotalIncome] = useState(0);
   const [userData, setUserData] = useState(null);
   const [checkInOutHistory, setCheckInOutHistory] = useState([]);
+  const router = useRouter();
 
   useEffect(() => {
-    // Fetch user profile data
-    async function fetchUserData() {
-      try {
-        const email = localStorage.getItem("userEmail");
-        const password = localStorage.getItem("userPassword");
-        if (email && password) {
-          const response = await axios.post("http://localhost:5000/user", {
-            email,
-            password,
-          });
-          if (response.data) {
-            setUserData(response.data);
-            setProfileImage(response.data.profileImage || "/default-profile.png");
-            setTotalIncome(response.data.total);
-          }
-        }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
-      }
-    }
+    const token = localStorage.getItem("authToken"); // Check for token in local storage
+    const email = localStorage.getItem("userEmail");
+    const password = localStorage.getItem("userPassword");
 
-    // Fetch check-in/out history
-    async function fetchCheckInOutHistory() {
-      try {
-        const response = await axios.get("http://localhost:5000/history");
-        setCheckInOutHistory(response.data);
-      } catch (error) {
-        console.error("Error fetching check-in/out history: ", error);
-      }
+    if (!token || !email || !password) {
+      router.push("/auth"); // Redirect to login page if not authenticated
+    } else {
+      fetchUserData(email, password);
+      fetchCheckInOutHistory(email);
     }
+  }, [router]);
 
-    fetchUserData();
-    fetchCheckInOutHistory();
-  }, []);
+  async function fetchUserData(email, password) {
+    try {
+      const response = await axios.get("http://localhost:5000/user");
+      const users = response.data;
+      const matchedUser = users.find(
+        (user) => user.email === email && user.password === password
+      );
+      if (matchedUser) {
+        setUserData(matchedUser);
+        setProfileImage(matchedUser.profileImage || "/default-profile.png");
+        setTotalIncome(matchedUser.total);
+      } else {
+        console.error("User not found");
+      }
+    } catch (error) {
+      console.error("Error fetching user data: ", error);
+    }
+  }
+
+  async function fetchCheckInOutHistory(email) {
+    try {
+      const response = await axios.get(`http://localhost:5000/history?email=${email}`);
+      setCheckInOutHistory(response.data);
+    } catch (error) {
+      console.error("Error fetching check-in/out history: ", error);
+    }
+  }
 
   const handleEditPassword = () => {
     setShowPasswordPopup(true);
@@ -65,10 +72,15 @@ const Profile = () => {
   const handleSavePassword = async () => {
     if (newPassword === confirmPassword) {
       try {
-        await axios.put("http://localhost:5000/user", {
-          newPassword
-        });
-        handleClosePasswordPopup();
+        const email = localStorage.getItem("userEmail");
+        if (email) {
+          await axios.put("http://localhost:5000/user/password", {
+            email,
+            oldPassword,
+            newPassword,
+          });
+          handleClosePasswordPopup();
+        }
       } catch (error) {
         console.error("Error saving password: ", error);
         alert("Failed to update password");
@@ -102,14 +114,20 @@ const Profile = () => {
     if (file) {
       const formData = new FormData();
       formData.append("profileImage", file);
+      const email = localStorage.getItem("userEmail");
 
       try {
-        const response = await axios.put("http://localhost:5000/user", formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
-        setProfileImage(response.data.profileImage);
+        if (email) {
+          const response = await axios.put("http://localhost:5000/user/image", formData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+            params: {
+              email,
+            },
+          });
+          setProfileImage(response.data.profileImage);
+        }
       } catch (error) {
         console.error("Error saving profile image: ", error);
         alert("Failed to update profile image");

@@ -1,18 +1,65 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const ToDoList = () => {
+  const [userEmail, setUserEmail] = useState(null);
   const [tasks, setTasks] = useState([]);
   const [isManaging, setIsManaging] = useState(false);
   const [showAddTaskPopup, setShowAddTaskPopup] = useState(false);
   const [newTaskName, setNewTaskName] = useState("");
   const [editTaskIndex, setEditTaskIndex] = useState(null);
 
+  // Load userEmail from localStorage on client side
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const email = localStorage.getItem("userEmail");
+      setUserEmail(email);
+    }
+  }, []);
+
+  // Load tasks when component mounts and userEmail is set
+  useEffect(() => {
+    if (userEmail) {
+      axios
+        .get(`http://localhost:5000/tasks?email=${userEmail}`)
+        .then((response) => {
+          const updatedTasks = response.data.map((task) => {
+            return {
+              ...task,
+              completed: task.completed ? 1 : 0,
+            };
+          });
+          setTasks(updatedTasks);
+        })
+        .catch((error) => {
+          console.error("Error fetching tasks: ", error);
+        });
+    }
+  }, [userEmail]);
+
   const handleCheckboxChange = (index) => {
-    const newTasks = [...tasks];
-    newTasks[index].completed = !newTasks[index].completed;
-    setTasks(newTasks);
+    const updatedTasks = [...tasks];
+    updatedTasks[index].completed = updatedTasks[index].completed ? 0 : 1;
+    updatedTasks[index].completedDate = updatedTasks[index].completed
+      ? new Date().toISOString().split("T")[0]
+      : null;
+  
+    axios
+      .put("http://localhost:5000/tasks", {
+        task_id: updatedTasks[index].task_id,
+        nameTask: updatedTasks[index].nameTask,
+        completed: updatedTasks[index].completed,
+        completedDate: updatedTasks[index].completedDate,
+        lastResetDate: updatedTasks[index].completed ? new Date().toISOString().split("T")[0] : null,
+      })
+      .then(() => {
+        setTasks(updatedTasks);
+      })
+      .catch((error) => {
+        console.error("Error updating task: ", error);
+      });
   };
 
   const handleManageList = () => {
@@ -32,53 +79,102 @@ const ToDoList = () => {
   const handleAddTask = () => {
     if (newTaskName) {
       if (editTaskIndex !== null) {
+        // Editing existing task
         const updatedTasks = [...tasks];
-        updatedTasks[editTaskIndex].name = newTaskName;
-        setTasks(updatedTasks);
+        updatedTasks[editTaskIndex].nameTask = newTaskName;
+
+        // Update the task in the database
+        axios
+          .put("http://localhost:5000/tasks", {
+            task_id: updatedTasks[editTaskIndex].task_id,
+            nameTask: newTaskName,
+            completed: updatedTasks[editTaskIndex].completed,
+            completedDate: updatedTasks[editTaskIndex].completedDate,
+          })
+          .then(() => {
+            setTasks(updatedTasks);
+            handleCloseAddTaskPopup();
+          })
+          .catch((error) => {
+            console.error("Error updating task: ", error);
+          });
       } else {
-        setTasks([...tasks, { name: newTaskName, completed: false }]);
+        // Adding new task
+        axios
+          .post("http://localhost:5000/tasks", {
+            email: userEmail,
+            nameTask: newTaskName,
+          })
+          .then((response) => {
+            setTasks([
+              ...tasks,
+              {
+                task_id: response.data.insertId,
+                nameTask: newTaskName,
+                completed: 0,
+                completedDate: null,
+              },
+            ]);
+            handleCloseAddTaskPopup();
+          })
+          .catch((error) => {
+            console.error("Error adding task: ", error);
+          });
       }
-      handleCloseAddTaskPopup();
     }
   };
 
   const handleEditTask = (index) => {
-    setNewTaskName(tasks[index].name);
+    setNewTaskName(tasks[index].nameTask);
     setEditTaskIndex(index);
     setShowAddTaskPopup(true);
   };
 
   const handleDeleteTask = (index) => {
-    const newTasks = tasks.filter((_, i) => i !== index);
-    setTasks(newTasks);
+    const taskToDelete = tasks[index];
+
+    axios
+      .delete(`http://localhost:5000/tasks/${taskToDelete.task_id}`)
+      .then((response) => {
+        console.log(response.data);
+        const updatedTasks = tasks.filter((_, i) => i !== index);
+        setTasks(updatedTasks);
+      })
+      .catch((error) => {
+        console.error("Error deleting task: ", error);
+      });
   };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* <Navbar /> */}
       <div className="container mx-auto p-8">
         <h1 className="text-3xl font-bold mb-4">To-Do List</h1>
         <div className="border-b border-gray-300 mb-6"></div>
         <div className="flex flex-col items-start">
           {tasks.length === 0 ? (
-            <p className="italic text-gray-400 mb-6">No tasks yet. Add one to get started!</p>
+            <p className="italic text-gray-400 mb-6">
+              No tasks yet. Add one to get started!
+            </p>
           ) : (
             <ul className="space-y-6 mb-6 w-full">
               {tasks.map((task, index) => (
-                <li key={index} className="flex items-center justify-between w-full text-lg">
+                <li
+                  key={task.task_id}
+                  className="flex items-center justify-between w-full text-lg"
+                >
                   <div className="flex items-center">
                     <input
                       type="checkbox"
                       className="mr-4"
-                      checked={task.completed}
+                      checked={task.completed === 1}
                       onChange={() => handleCheckboxChange(index)}
                     />
                     <span
                       className={`${
-                        task.completed ? "line-through text-gray-500" : ""
+                        task.completed === 1 ? "line-through text-gray-500" : ""
                       }`}
                     >
-                      {task.name}
+                      {task.nameTask}
                     </span>
                   </div>
                   {isManaging && (
@@ -101,6 +197,23 @@ const ToDoList = () => {
               ))}
             </ul>
           )}
+
+          <h2 className="text-2xl font-bold mb-4">Completed Tasks</h2>
+          <ul className="space-y-6 mb-6 w-full">
+            {tasks
+              .filter((task) => task.completed === 1)
+              .map((task, index) => (
+                <li
+                  key={task.task_id}
+                  className="flex items-center w-full text-lg"
+                >
+                  <span className="line-through text-gray-500">
+                    {task.nameTask}
+                  </span>
+                </li>
+              ))}
+          </ul>
+
           {isManaging && (
             <div className="flex justify-center w-full mb-4">
               <button
@@ -118,24 +231,6 @@ const ToDoList = () => {
             {isManaging ? "Done" : "Manage List"}
           </button>
         </div>
-        {tasks.length > 0 && (
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Completed Tasks</h2>
-            {tasks.filter((task) => task.completed).length === 0 ? (
-              <p className="italic text-gray-400">No completed tasks yet.</p>
-            ) : (
-              <ul className="space-y-2">
-                {tasks
-                  .filter((task) => task.completed)
-                  .map((task, index) => (
-                    <li key={index} className="text-gray-600 text-lg">
-                      {task.name}
-                    </li>
-                  ))}
-              </ul>
-            )}
-          </div>
-        )}
       </div>
 
       {showAddTaskPopup && (

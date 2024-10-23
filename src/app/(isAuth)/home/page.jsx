@@ -70,7 +70,13 @@ export default function Home() {
       const checkInTime = new Date(timestamp);
       const checkOutTime = new Date();
       const minutesWorked = Math.abs(checkOutTime - checkInTime) / 60000;
-      const rate = userData.rate || 60; // Use user's rate if available
+      let rate = userData.rate || 60; // Use user's rate if available
+
+      // Increase rate by 10 if worked more than 8 hours
+      if (minutesWorked > 480) {
+        rate += 10;
+      }
+
       const income = Math.round((minutesWorked / 60) * rate);
 
       // Save totalIncome to database

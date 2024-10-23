@@ -40,7 +40,6 @@ const Balance = () => {
       setIsCheckedIn(false);
     }
   }, []);
-  
 
   const handleCheckBalance = () => {
     if (isCheckedIn && checkInTimestamp) {
@@ -65,7 +64,14 @@ const Balance = () => {
     const checkInTime = new Date(checkInTimestamp);
     const currentTime = new Date();
     const minutesWorked = Math.abs(currentTime - checkInTime) / 60000;
-    const income = (minutesWorked / 60) * rate;
+    let effectiveRate = rate;
+
+    // Check if worked more than 8 hours
+    if (minutesWorked > 480) {
+      effectiveRate += 10;
+    }
+
+    const income = (minutesWorked / 60) * effectiveRate;
     return parseFloat(income.toFixed(2));
   };
 

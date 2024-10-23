@@ -1,51 +1,56 @@
 "use client";
 
-import React, { useState } from 'react';
-import { FaEnvelope, FaLock, FaUserAlt, FaPhone, FaCalendarAlt, FaDollarSign } from 'react-icons/fa';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import React, { useState } from "react";
+import {
+  FaEnvelope,
+  FaLock,
+  FaUserAlt,
+  FaPhone,
+  FaCalendarAlt,
+  FaDollarSign,
+} from "react-icons/fa";
+import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function Page() {
   const router = useRouter();
   const [mode, setMode] = useState(0);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [birth, setBirth] = useState('');
-  const [rate, setRate] = useState('');
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [birth, setBirth] = useState("");
+  const [rate, setRate] = useState("");
 
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get('http://localhost:5000/user');
-      const user = response.data.find(
-        (u) => u.email === email && u.password === password
-      );
+      const response = await axios.get("http://localhost:5000/user");
+      const user = response.data.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
       if (user) {
-        localStorage.setItem('userEmail', user.email);
-        localStorage.setItem('userPassword', user.password);
-        localStorage.setItem('authToken', user.email);
-        router.push('./home');
+        localStorage.setItem("userEmail", user.email);
+        localStorage.setItem("userPassword", user.password);
+        localStorage.setItem("authToken", user.email);
+        router.push("./home");
       } else {
-        setErrorMessage('Invalid email or password');
+        setErrorMessage("Invalid email or password");
       }
     } catch (error) {
-      setErrorMessage('An error occurred. Please try again later.');
+      setErrorMessage("An error occurred. Please try again later.");
     }
   };
 
   const handleSignUp = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get('http://localhost:5000/user');
+      const response = await axios.get("http://localhost:5000/user");
       const existingUser = response.data.find((u) => u.email === email);
 
       if (existingUser) {
-        setErrorMessage('Email is already in use');
+        setErrorMessage("Email is already in use");
         return;
       }
 
@@ -54,17 +59,17 @@ export default function Page() {
         lastName,
         phone,
         birth,
-        startDate: new Date().toISOString().split('T')[0],
+        startDate: new Date().toISOString().split("T")[0],
         password,
         email,
         rate,
         total: 0,
       };
 
-      await axios.post('http://localhost:5000/user', newUser);
-      router.push('./home');
+      await axios.post("http://localhost:5000/user", newUser);
+      router.push("./home");
     } catch (error) {
-      setErrorMessage('An error occurred. Please try again later.');
+      setErrorMessage("An error occurred. Please try again later.");
     }
   };
 
@@ -74,7 +79,10 @@ export default function Page() {
         <h2 className="text-2xl font-bold text-center">Sign Up</h2>
         <form className="mt-6" onSubmit={handleSignUp}>
           <div className="mb-4">
-            <label htmlFor="firstName" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="firstName"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               First name
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -91,7 +99,10 @@ export default function Page() {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="lastName" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="lastName"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Last name
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -108,24 +119,10 @@ export default function Page() {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
-              Email
-            </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
-              <FaEnvelope className="text-gray-400" />
-              <input
-                type="email"
-                id="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
-                className="w-full px-2 py-2 focus:outline-none"
-              />
-            </div>
-          </div>
-
-          <div className="mb-4">
-            <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="phone"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Phone
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -143,7 +140,10 @@ export default function Page() {
 
           {/* Date Field */}
           <div className="mb-4">
-            <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="date"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Date of Birth
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -160,7 +160,10 @@ export default function Page() {
 
           {/* Rate Field */}
           <div className="mb-4">
-            <label htmlFor="rate" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="rate"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Rate
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -175,9 +178,31 @@ export default function Page() {
               />
             </div>
           </div>
+          <div className="mb-4">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
+            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+              <FaEnvelope className="text-gray-400" />
+              <input
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Enter your email"
+                className="w-full px-2 py-2 focus:outline-none"
+              />
+            </div>
+          </div>
 
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -194,7 +219,10 @@ export default function Page() {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="confirmPassword"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Confirm Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -220,8 +248,11 @@ export default function Page() {
           </button>
         </form>
         <p className="mt-4 py-5 text-sm text-center">
-          Already have an account?{' '}
-          <span onClick={(e) => setMode(0)} className="text-blue-600 hover:underline cursor-pointer">
+          Already have an account?{" "}
+          <span
+            onClick={(e) => setMode(0)}
+            className="text-blue-600 hover:underline cursor-pointer"
+          >
             Sign In
           </span>
         </p>
@@ -233,7 +264,10 @@ export default function Page() {
         <h2 className="text-2xl font-bold text-center">Sign In</h2>
         <form className="mt-6" onSubmit={handleSignIn}>
           <div className="mb-4">
-            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -248,9 +282,12 @@ export default function Page() {
               />
             </div>
           </div>
-  
+
           <div className="mb-4">
-            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block mb-2 text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md">
@@ -265,11 +302,11 @@ export default function Page() {
               />
             </div>
           </div>
-  
+
           {errorMessage && (
             <p className="text-red-500 text-sm mb-4">{errorMessage}</p>
           )}
-  
+
           <button
             type="submit"
             className="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none"
@@ -278,8 +315,11 @@ export default function Page() {
           </button>
         </form>
         <p className="mt-4 py-0.5 text-sm text-center">
-          Don’t have an account?{' '}
-          <span onClick={(e) => setMode(1)} className="text-blue-600 hover:underline cursor-pointer">
+          Don’t have an account?{" "}
+          <span
+            onClick={(e) => setMode(1)}
+            className="text-blue-600 hover:underline cursor-pointer"
+          >
             Sign Up
           </span>
         </p>
