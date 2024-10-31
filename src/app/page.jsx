@@ -82,9 +82,9 @@ export default function Page() {
   };
 
   return mode == 1 ? (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-0 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-200 py-10">
+      <div className="w-full max-w-md p-8 space-y-0 bg-white rounded-3xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center text-slate-900 mb-6">Sign Up</h2>
         <form className="mt-6" onSubmit={handleSignUp}>
           <div className="mb-4">
             <label
@@ -93,7 +93,7 @@ export default function Page() {
             >
               First name
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaUserAlt className="text-gray-400" />
               <input
                 type="text"
@@ -101,7 +101,7 @@ export default function Page() {
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
                 placeholder="Enter your first name"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -113,7 +113,7 @@ export default function Page() {
             >
               Last name
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaUserAlt className="text-gray-400" />
               <input
                 type="text"
@@ -121,7 +121,7 @@ export default function Page() {
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
                 placeholder="Enter your last name"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function Page() {
             >
               Phone
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaPhone className="text-gray-400" />
               <input
                 type="tel"
@@ -141,7 +141,7 @@ export default function Page() {
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="Enter your phone"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -154,14 +154,14 @@ export default function Page() {
             >
               Date of Birth
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaCalendarAlt className="text-gray-400" />
               <input
                 type="date"
                 id="date"
                 value={birth}
                 onChange={(e) => setBirth(e.target.value)}
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -174,7 +174,7 @@ export default function Page() {
             >
               Rate
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaDollarSign className="text-gray-400" />
               <input
                 type="number"
@@ -182,10 +182,11 @@ export default function Page() {
                 value={rate}
                 onChange={(e) => setRate(e.target.value)}
                 placeholder="Enter your rate"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
+
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -193,7 +194,7 @@ export default function Page() {
             >
               Email
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaEnvelope className="text-gray-400" />
               <input
                 type="email"
@@ -201,7 +202,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -213,7 +214,7 @@ export default function Page() {
             >
               Password
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaLock className="text-gray-400" />
               <input
                 type="password"
@@ -221,7 +222,7 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -233,13 +234,13 @@ export default function Page() {
             >
               Confirm Password
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaLock className="text-gray-400" />
               <input
                 type="password"
                 id="confirmPassword"
                 placeholder="Enter your confirm password"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -250,7 +251,7 @@ export default function Page() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none"
+            className="mt-4 w-full px-4 py-2 text-white bg-black rounded-xl hover:bg-gray-800 shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
           >
             Create Account
           </button>
@@ -259,7 +260,7 @@ export default function Page() {
           Already have an account?{" "}
           <span
             onClick={(e) => setMode(0)}
-            className="text-blue-600 hover:underline cursor-pointer"
+            className="text-indigo-600 hover:underline cursor-pointer"
           >
             Sign In
           </span>
@@ -267,9 +268,9 @@ export default function Page() {
       </div>
     </div>
   ) : (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="w-full max-w-md p-8 space-y-8 bg-white rounded-lg shadow-md">
-        <h2 className="text-2xl font-bold text-center">Sign In</h2>
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-200">
+      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-3xl shadow-2xl">
+        <h2 className="text-3xl font-bold text-center text-slate-900">Sign In</h2>
         <form className="mt-6" onSubmit={handleSignIn}>
           <div className="mb-4">
             <label
@@ -278,7 +279,7 @@ export default function Page() {
             >
               Email
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaEnvelope className="text-gray-400" />
               <input
                 type="email"
@@ -286,7 +287,7 @@ export default function Page() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="Enter your email"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -298,7 +299,7 @@ export default function Page() {
             >
               Password
             </label>
-            <div className="flex items-center px-3 border border-gray-300 rounded-md">
+            <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
               <FaLock className="text-gray-400" />
               <input
                 type="password"
@@ -306,7 +307,7 @@ export default function Page() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter your password"
-                className="w-full px-2 py-2 focus:outline-none"
+                className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
@@ -317,7 +318,7 @@ export default function Page() {
 
           <button
             type="submit"
-            className="w-full px-4 py-2 text-white bg-black rounded-md hover:bg-gray-800 focus:outline-none"
+            className="mt-4 w-full px-4 py-2 text-white bg-black rounded-xl hover:bg-gray-800 shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-700 focus:ring-offset-2"
           >
             Sign In
           </button>
@@ -326,7 +327,7 @@ export default function Page() {
           Don’t have an account?{" "}
           <span
             onClick={(e) => setMode(1)}
-            className="text-blue-600 hover:underline cursor-pointer"
+            className="text-indigo-600 hover:underline cursor-pointer"
           >
             Sign Up
           </span>
@@ -334,4 +335,4 @@ export default function Page() {
       </div>
     </div>
   );
-}
+}   

@@ -96,10 +96,10 @@ const Balance = () => {
               loading="eager"
             />
           </div>
-          <h2 className="text-2xl font-semibold mb-6">Checking the Balance</h2>
+          <h2 className="text-2xl font-semibold mb-8">Checking the Balance</h2>
           <button
             onClick={handleCheckBalance}
-            className="text-lg bg-green-500 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
+            className="text-lg bg-green-500 text-white px-4 py-2.5 rounded-xl font-semibold shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
           >
             Check Balance
           </button>

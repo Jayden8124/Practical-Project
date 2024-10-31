@@ -253,9 +253,9 @@ const Profile = () => {
               <div className="pt-10">
                 <button
                   onClick={handleShowHistory}
-                  className="ml-2 bg-green-500 text-white px-3.5 py-1.5 rounded-lg font-medium text-base shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
+                  className="ml-2 bg-green-500 text-white px-5 py-2 rounded-lg font-medium text-base shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
                 >
-                  Check
+                  History
                 </button>
               </div>
             </div>

@@ -9,7 +9,7 @@ const Navbar = () => {
   return (
     <nav className="bg-white p-6 flex justify-between items-center fixed top-0 w-full shadow-lg z-50 border-b border-gray-200">
 
-      <div className="flex space-x-8 ml-5">
+      <div className="flex space-x-10 ml-5">
         <button
           onClick={() => router.push('./home')}
           className="text-gray-800 hover:text-indigo-600 text-lg font-medium transition ease-in-out duration-300"
