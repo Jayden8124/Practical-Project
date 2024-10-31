@@ -11,7 +11,6 @@ const ToDoList = () => {
   const [newTaskName, setNewTaskName] = useState("");
   const [editTaskIndex, setEditTaskIndex] = useState(null);
 
-  // Load userEmail from localStorage on client side
   useEffect(() => {
     if (typeof window !== "undefined") {
       const email = localStorage.getItem("userEmail");
@@ -19,7 +18,6 @@ const ToDoList = () => {
     }
   }, []);
 
-  // Load tasks when component mounts and userEmail is set
   useEffect(() => {
     if (userEmail) {
       axios
@@ -45,14 +43,16 @@ const ToDoList = () => {
     updatedTasks[index].completedDate = updatedTasks[index].completed
       ? new Date().toISOString().split("T")[0]
       : null;
-  
+
     axios
       .put("http://localhost:5000/tasks", {
         task_id: updatedTasks[index].task_id,
         nameTask: updatedTasks[index].nameTask,
         completed: updatedTasks[index].completed,
         completedDate: updatedTasks[index].completedDate,
-        lastResetDate: updatedTasks[index].completed ? new Date().toISOString().split("T")[0] : null,
+        lastResetDate: updatedTasks[index].completed
+          ? new Date().toISOString().split("T")[0]
+          : null,
       })
       .then(() => {
         setTasks(updatedTasks);
@@ -79,17 +79,14 @@ const ToDoList = () => {
   const handleAddTask = () => {
     if (newTaskName) {
       if (editTaskIndex !== null) {
-        // Editing existing task
         const updatedTasks = [...tasks];
         updatedTasks[editTaskIndex].nameTask = newTaskName;
 
-        // Update the task in the database
         axios
           .put("http://localhost:5000/tasks", {
             task_id: updatedTasks[editTaskIndex].task_id,
-            nameTask: newTaskName,
+            nameTask: updatedTasks[editTaskIndex].nameTask,
             completed: updatedTasks[editTaskIndex].completed,
-            completedDate: updatedTasks[editTaskIndex].completedDate,
           })
           .then(() => {
             setTasks(updatedTasks);
@@ -99,7 +96,6 @@ const ToDoList = () => {
             console.error("Error updating task: ", error);
           });
       } else {
-        // Adding new task
         axios
           .post("http://localhost:5000/tasks", {
             email: userEmail,
@@ -135,8 +131,7 @@ const ToDoList = () => {
 
     axios
       .delete(`http://localhost:5000/tasks/${taskToDelete.task_id}`)
-      .then((response) => {
-        console.log(response.data);
+      .then(() => {
         const updatedTasks = tasks.filter((_, i) => i !== index);
         setTasks(updatedTasks);
       })
@@ -146,7 +141,7 @@ const ToDoList = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-100 pt-20">
       <div className="container mx-auto p-8">
         <h1 className="text-3xl font-bold mb-4">To-Do List</h1>
         <div className="border-b border-gray-300 mb-6"></div>
@@ -160,12 +155,12 @@ const ToDoList = () => {
               {tasks.map((task, index) => (
                 <li
                   key={task.task_id}
-                  className="flex items-center justify-between w-full text-lg"
+                  className="flex items-center justify-between w-full font-medium text-lg bg-white p-4 rounded-lg shadow-md"
                 >
                   <div className="flex items-center">
                     <input
                       type="checkbox"
-                      className="mr-4"
+                      className="mr-4 h-5 w-5 text-indigo-600 focus:ring-indigo-500 rounded-lg"
                       checked={task.completed === 1}
                       onChange={() => handleCheckboxChange(index)}
                     />
@@ -181,13 +176,13 @@ const ToDoList = () => {
                     <div className="ml-auto flex space-x-2">
                       <button
                         onClick={() => handleEditTask(index)}
-                        className="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600"
+                        className="bg-blue-500 text-white px-3 py-1 text-sm rounded hover:bg-blue-600 transition ease-in-out duration-300"
                       >
                         Edit
                       </button>
                       <button
                         onClick={() => handleDeleteTask(index)}
-                        className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600"
+                        className="bg-red-500 text-white px-3 py-1 text-sm rounded hover:bg-red-600 transition ease-in-out duration-300"
                       >
                         Delete
                       </button>
@@ -202,10 +197,10 @@ const ToDoList = () => {
           <ul className="space-y-6 mb-6 w-full">
             {tasks
               .filter((task) => task.completed === 1)
-              .map((task, index) => (
+              .map((task) => (
                 <li
                   key={task.task_id}
-                  className="flex items-center w-full text-lg"
+                  className="flex items-center w-full text-lg bg-gray-100 p-4 rounded-lg shadow-inner"
                 >
                   <span className="line-through text-gray-500">
                     {task.nameTask}
@@ -218,7 +213,7 @@ const ToDoList = () => {
             <div className="flex justify-center w-full mb-4">
               <button
                 onClick={handleOpenAddTaskPopup}
-                className="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600"
+                className="bg-green-500 text-white px-5 py-2.5 rounded-lg shadow-md hover:bg-green-600 transition ease-in-out duration-300"
               >
                 Add Task
               </button>
@@ -226,7 +221,7 @@ const ToDoList = () => {
           )}
           <button
             onClick={handleManageList}
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800 self-end"
+            className="bg-black text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition-all duration-300 ease-in-out self-end"
           >
             {isManaging ? "Done" : "Manage List"}
           </button>
@@ -235,7 +230,7 @@ const ToDoList = () => {
 
       {showAddTaskPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
             <button
               onClick={handleCloseAddTaskPopup}
               className="absolute top-2 right-2 text-gray-600 hover:text-black"
@@ -249,12 +244,12 @@ const ToDoList = () => {
               type="text"
               value={newTaskName}
               onChange={(e) => setNewTaskName(e.target.value)}
-              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-gray-500"
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded-lg focus:outline-none focus:border-gray-500"
               placeholder="Enter task name"
             />
             <button
               onClick={handleAddTask}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition ease-in-out duration-300"
             >
               {editTaskIndex !== null ? "Save Changes" : "Add Task"}
             </button>

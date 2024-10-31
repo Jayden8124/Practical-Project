@@ -29,7 +29,11 @@ export default function Page() {
     e.preventDefault();
     try {
       const response = await axios.get("http://localhost:5000/user");
-      const user = response.data.find((u) => u.email.toLowerCase() === email.toLowerCase() && u.password === password);
+      const user = response.data.find(
+        (u) =>
+          u.email.toLowerCase() === email.toLowerCase() &&
+          u.password === password
+      );
       if (user) {
         localStorage.setItem("userEmail", user.email);
         localStorage.setItem("userPassword", user.password);
@@ -45,6 +49,10 @@ export default function Page() {
 
   const handleSignUp = async (e) => {
     e.preventDefault();
+    if (!firstName || !lastName || !phone || !birth || !rate || !email || !password) {
+      setErrorMessage("Please fill in all the fields");
+      return;
+    }
     try {
       const response = await axios.get("http://localhost:5000/user");
       const existingUser = response.data.find((u) => u.email === email);
@@ -67,7 +75,7 @@ export default function Page() {
       };
 
       await axios.post("http://localhost:5000/user", newUser);
-      router.push("./home");
+      setMode(0);
     } catch (error) {
       setErrorMessage("An error occurred. Please try again later.");
     }

@@ -75,7 +75,7 @@ const Balance = () => {
 
     // Check if worked more than 8 hours
     if (minutesWorked > 480) {
-      effectiveRate += 10;
+      effectiveRate *= 1.5;
     }
 
     const income = (minutesWorked / 60) * effectiveRate;
@@ -83,10 +83,10 @@ const Balance = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="container mx-auto mt-3 p-8 flex items-center justify-center">
-        <div className="bg-gray-200 p-8 rounded-lg w-full max-w-2xl text-center">
-          <div className="w-40 h-40 bg-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
+    <div className="min-h-screen bg-gradient-to-b from-white to-gray-200 flex flex-col pt-24">
+      <div className="container mx-auto p-8 flex items-center justify-center">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl text-center">
+          <div className="w-40 h-40 bg-gradient-to-b from-gray-400 to-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
             <Image
               src={profileImage}
               alt=""
@@ -96,10 +96,10 @@ const Balance = () => {
               loading="eager"
             />
           </div>
-          <h2 className="text-3xl font-bold mb-6">Balance</h2>
+          <h2 className="text-2xl font-semibold mb-6">Checking the Balance</h2>
           <button
             onClick={handleCheckBalance}
-            className="bg-black text-white px-4 py-2 rounded hover:bg-gray-800"
+            className="text-lg bg-green-500 text-white px-5 py-2.5 rounded-xl font-semibold shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
           >
             Check Balance
           </button>
@@ -108,7 +108,7 @@ const Balance = () => {
 
       {showPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
             <button
               onClick={handleClosePopup}
               className="absolute top-2 right-2 text-gray-600 hover:text-black"
@@ -129,7 +129,7 @@ const Balance = () => {
 
       {showNoCheckInPopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
             <button
               onClick={handleCloseNoCheckInPopup}
               className="absolute top-2 right-2 text-gray-600 hover:text-black"
