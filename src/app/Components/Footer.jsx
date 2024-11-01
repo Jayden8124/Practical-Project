@@ -1,11 +1,11 @@
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 const Footer = () => {
   const router = useRouter();
 
   const handleLogout = () => {
     localStorage.clear(); // Clear all local storage data
-    router.push('/..'); // Redirect to login page
+    router.push("/.."); // Redirect to login page
   };
 
   return (

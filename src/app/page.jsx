@@ -28,22 +28,12 @@ export default function Page() {
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.get("http://localhost:5000/user");
-      const user = response.data.find(
-        (u) =>
-          u.email.toLowerCase() === email.toLowerCase() &&
-          u.password === password
-      );
-      if (user) {
-        localStorage.setItem("userEmail", user.email);
-        localStorage.setItem("userPassword", user.password);
-        localStorage.setItem("authToken", user.email);
-        router.push("./home");
-      } else {
-        setErrorMessage("Invalid email or password");
-      }
+      const response = await axios.post("http://localhost:5000/user/login", { email, password });
+      localStorage.setItem("userEmail", response.data.email);
+      localStorage.setItem("authToken", response.data.email);
+      router.push("./home");
     } catch (error) {
-      setErrorMessage("An error occurred. Please try again later.");
+      setErrorMessage("Invalid email or password");
     }
   };
 
@@ -53,23 +43,15 @@ export default function Page() {
       setErrorMessage("Please fill in all the fields");
       return;
     }
+
     try {
-      const response = await axios.get("http://localhost:5000/user");
-      const existingUser = response.data.find((u) => u.email === email);
-
-      if (existingUser) {
-        setErrorMessage("Email is already in use");
-        return;
-      }
-
       const newUser = {
         firstName,
         lastName,
         phone,
         birth,
-        startDate: new Date().toISOString().split("T")[0],
-        password,
         email,
+        password,
         rate,
         total: 0,
       };

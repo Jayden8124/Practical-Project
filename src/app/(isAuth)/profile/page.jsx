@@ -7,34 +7,37 @@ import { useRouter } from "next/navigation";
 
 const Profile = () => {
   const [showEditImagePopup, setShowEditImagePopup] = useState(false);
+  const [showChangePasswordPopup, setShowChangePasswordPopup] = useState(false);
   const [profileImage, setProfileImage] = useState("");
   const [totalIncome, setTotalIncome] = useState(0);
   const [userData, setUserData] = useState(null);
   const [checkInOutHistory, setCheckInOutHistory] = useState([]);
   const [showHistoryPopup, setShowHistoryPopup] = useState(false);
   const [filterAction, setFilterAction] = useState("All");
+  const [oldPassword, setOldPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPasswordSuccessPopup, setShowPasswordSuccessPopup] = useState(false);
+  const [showPasswordErrorPopup, setShowPasswordErrorPopup] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
-    const password = localStorage.getItem("userPassword");
 
-    if (!token || !email || !password) {
-      router.push("/auth");
+    if (!token || !email) {
+      router.push("/..");
     } else {
-      fetchUserData(email, password);
+      fetchUserData(email);
       fetchCheckInOutHistory(email);
     }
   }, [router]);
 
-  async function fetchUserData(email, password) {
+  async function fetchUserData(email) {
     try {
       const response = await axios.get("http://localhost:5000/user");
       const users = response.data;
-      const matchedUser = users.find(
-        (user) => user.email === email && user.password === password
-      );
+      const matchedUser = users.find((user) => user.email === email);
       if (matchedUser) {
         setUserData(matchedUser);
         setProfileImage(
@@ -58,7 +61,7 @@ const Profile = () => {
       );
       const data = response.data.map((entry) => {
         const dbTime = new Date(entry.time);
-        const localTime = new Date(dbTime.getTime() + 7 * 60 * 60 * 1000); // เพิ่ม 7 ชั่วโมง
+        const localTime = new Date(dbTime.getTime() + 7 * 60 * 60 * 1000); // add 7 hours (debug)
         return {
           ...entry,
           time: localTime,
@@ -111,6 +114,51 @@ const Profile = () => {
     handleCloseEditImagePopup();
   };
 
+  const handleChangePassword = async () => {
+    const email = localStorage.getItem("userEmail");
+    if (!email || !oldPassword || !newPassword || !confirmPassword) {
+      alert("Please fill in all the fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("New password and confirm password do not match");
+      return;
+    }
+
+    try {
+      const response = await axios.put("http://localhost:5000/user/password", {
+        email,
+        oldPassword,
+        newPassword,
+      });
+
+      if (response.status === 200) {
+        setShowPasswordSuccessPopup(true);
+        handleCloseChangePasswordPopup();
+      }
+    } catch (error) {
+      console.error("Error updating password: ", error);
+      setShowPasswordErrorPopup(true);
+    }
+  };
+
+  const handleChangePasswordPopup = () => {
+    setShowChangePasswordPopup(true);
+  };
+
+  const handleCloseChangePasswordPopup = () => {
+    setShowChangePasswordPopup(false);
+  };
+
+  const handleClosePasswordSuccessPopup = () => {
+    setShowPasswordSuccessPopup(false);
+  };
+
+  const handleClosePasswordErrorPopup = () => {
+    setShowPasswordErrorPopup(false);
+  };
+
   const handleEditImage = () => {
     setShowEditImagePopup(true);
   };
@@ -154,9 +202,7 @@ const Profile = () => {
       <div className="container mx-auto p-8 flex items-center justify-center">
         <div className="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-2xl text-center">
           <h1 className="text-3xl font-semibold mb-6">
-            {userData
-              ? `${userData.firstName} ${userData.lastName}`
-              : "Loading..."}
+            {userData ? `${userData.firstName} ${userData.lastName}` : "Loading..."}
           </h1>
           <div className="w-40 h-40 bg-gradient-to-b from-gray-400 to-gray-300 rounded-full mx-auto mb-6 overflow-hidden flex items-center justify-center">
             <Image
@@ -253,9 +299,15 @@ const Profile = () => {
               <div className="pt-10">
                 <button
                   onClick={handleShowHistory}
-                  className="ml-2 bg-green-500 text-white px-5 py-2 rounded-lg font-medium text-base shadow-md hover:bg-green-600 hover:shadow-lg transition-all duration-300 ease-in-out"
+                  className="mx-auto bg-gray-700 text-white px-5 py-2 rounded-lg font-medium text-base shadow-md hover:bg-gray-800 hover:shadow-lg transition-all duration-300 ease-in-out"
                 >
                   History
+                </button>
+                <button
+                  onClick={handleChangePasswordPopup}
+                  className="mx-auto mt-3 ml-3 bg-red-600 text-white px-5 py-2 rounded-xl font-medium shadow-md hover:bg-red-700 hover:shadow-lg transition-all duration-300 ease-in-out"
+                >
+                  Change Password
                 </button>
               </div>
             </div>
@@ -264,6 +316,77 @@ const Profile = () => {
           )}
         </div>
       </div>
+
+      {showChangePasswordPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
+            <button
+              onClick={handleCloseChangePasswordPopup}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-6">Change Password</h2>
+            <input
+              type="password"
+              placeholder="Old Password"
+              value={oldPassword}
+              onChange={(e) => setOldPassword(e.target.value)}
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-gray-500"
+            />
+            <input
+              type="password"
+              placeholder="New Password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-gray-500"
+            />
+            <input
+              type="password"
+              placeholder="Confirm Password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              className="w-full px-4 py-2 mb-4 border border-gray-300 rounded focus:outline-none focus:border-gray-500"
+            />
+            <button
+              onClick={handleChangePassword}
+              className="w-full bg-blue-600 text-white px-4 py-2 rounded font-medium hover:bg-blue-700"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {showPasswordSuccessPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
+            <button
+              onClick={handleClosePasswordSuccessPopup}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Password Updated</h2>
+            <p className="text-gray-600">Your password has been updated successfully.</p>
+          </div>
+        </div>
+      )}
+
+      {showPasswordErrorPopup && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
+            <button
+              onClick={handleClosePasswordErrorPopup}
+              className="absolute top-2 right-2 text-gray-600 hover:text-black"
+            >
+              &times;
+            </button>
+            <h2 className="text-2xl font-bold mb-4">Password Update Failed</h2>
+            <p className="text-gray-600">Failed to update password. Please check your old password and try again.</p>
+          </div>
+        </div>
+      )}
 
       {showEditImagePopup && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">

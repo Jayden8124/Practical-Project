@@ -20,7 +20,9 @@ const Balance = () => {
       try {
         const email = localStorage.getItem("userEmail");
         if (email) {
-          const response = await axios.get(`http://localhost:5000/user/${email}`);
+          const response = await axios.get(
+            `http://localhost:5000/user/${email}`
+          );
           if (response.data) {
             setUserData(response.data);
             setRate(response.data.rate);
@@ -73,7 +75,7 @@ const Balance = () => {
     const minutesWorked = Math.abs(currentTime - checkInTime) / 60000;
     let effectiveRate = rate;
 
-    // Check if worked more than 8 hours
+    // Check if worked more than 8 hours (only week days)
     if (minutesWorked > 480) {
       effectiveRate *= 1.5;
     }

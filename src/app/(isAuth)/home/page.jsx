@@ -15,24 +15,21 @@ const Home = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("authToken"); // Check for token in local storage
+    const token = localStorage.getItem("authToken"); 
     const email = localStorage.getItem("userEmail");
-    const password = localStorage.getItem("userPassword");
 
-    if (!token || !email || !password) {
-      router.push("/auth"); // Redirect to login page if not authenticated
+    if (!token || !email) {
+      router.push("/.."); // Redirect to login page if not authenticated
     } else {
-      fetchData(email, password);
+      fetchData(email);
     }
   }, [router]);
 
-  async function fetchData(email, password) {
+  async function fetchData(email) {
     try {
       const response = await axios.get("http://localhost:5000/user");
       const users = response.data;
-      const matchedUser = users.find(
-        (user) => user.email === email && user.password === password
-      );
+      const matchedUser = users.find((user) => user.email === email);
       if (matchedUser) {
         setUserData(matchedUser);
         setProfileImage(
@@ -73,20 +70,19 @@ const Home = () => {
     const action = isCheckedIn ? "Check Out" : "Check In";
 
     if (isCheckedIn) {
-      // Check Out
+      // Check Out Function
       const checkInTime = new Date(timestamp);
       const checkOutTime = new Date();
       const minutesWorked = Math.abs(checkOutTime - checkInTime) / 60000;
-      let rate = userData.rate || 60; // ใช้อัตราจากผู้ใช้หากมี
+      let rate = userData.rate || 60; 
 
-      // เพิ่มอัตราการคิดเงินเมื่อทำงานเกิน 8 ชั่วโมง
       if (minutesWorked > 480) {
         rate *= 1.5;
       }
 
       const income = Math.round((minutesWorked / 60) * rate);
 
-      // บันทึกข้อมูล totalIncome ลงฐานข้อมูล
+      // Save total income to database
       try {
         await axios.put(`http://localhost:5000/user/${userData.email}`, {
           total: userData.total + income,
@@ -96,7 +92,7 @@ const Home = () => {
         console.error("Error saving income data: ", error);
       }
 
-      // บันทึกการ Check Out ลงในตาราง history พร้อมกับ income
+      // save check out to table history database
       try {
         await axios.post("http://localhost:5000/history", {
           action,
@@ -113,14 +109,14 @@ const Home = () => {
       localStorage.setItem("isCheckedIn", "false");
       localStorage.setItem("timestamp", currentTime);
     } else {
-      // Check In
-      // บันทึกการ Check In ลงในตาราง history (ไม่มี income ตอน check in)
+      // Check In Function
+      // Save Check In to Table history database
       try {
         await axios.post("http://localhost:5000/history", {
           action,
           email: userData.email,
           time: currentTime,
-          income: 0, // ใส่เป็น 0 เพราะยังไม่ได้คำนวณรายได้ตอน Check In
+          income: 0, // Set 0 cause Check In not count the income
         });
       } catch (error) {
         console.error("Error saving check-in history: ", error);
