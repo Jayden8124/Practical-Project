@@ -47,6 +47,11 @@ export default function Page() {
     return phoneRegex.test(phone);
   };
 
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleSignIn = async (e) => {
     e.preventDefault();
     try {
@@ -68,6 +73,11 @@ export default function Page() {
 
     if (!validateEmail(email)) {
       setErrorMessage("Email must be in the format test@gmail.com or test@admin.com");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      setErrorMessage("Password must be at least 8 characters long and include at least one uppercase letter and one number");
       return;
     }
 

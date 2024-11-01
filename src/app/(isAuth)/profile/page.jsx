@@ -27,6 +27,11 @@ const Profile = () => {
     setConfirmPassword("");
   };
 
+  const validatePassword = (password) => {
+    const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
@@ -124,6 +129,11 @@ const Profile = () => {
     const email = localStorage.getItem("userEmail");
     if (!email || !oldPassword || !newPassword || !confirmPassword) {
       alert("Please fill in all the fields");
+      return;
+    }
+
+    if (!validatePassword(newPassword)) {
+      alert("New password must be at least 8 characters long and include at least one uppercase letter and one number");
       return;
     }
 
