@@ -17,13 +17,35 @@ export default function Page() {
   const [mode, setMode] = useState(0);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [birth, setBirth] = useState("");
   const [rate, setRate] = useState("");
+
+  const clearFormData = () => {
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setFirstName("");
+    setLastName("");
+    setPhone("");
+    setBirth("");
+    setRate("");
+    setErrorMessage("");
+  };
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[\w-.]+@(gmail\.com|admin\.com)$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePhone = (phone) => {
+    const phoneRegex = /^\d{10}$/;
+    return phoneRegex.test(phone);
+  };
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -44,11 +66,28 @@ export default function Page() {
       return;
     }
 
+    if (!validateEmail(email)) {
+      setErrorMessage("Email must be in the format test@gmail.com or test@admin.com");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    if (!validatePhone(phone)) {
+      setErrorMessage("Phone number must be 10 digits long");
+      return;
+    }
+
+    const formattedPhone = phone.replace(/(\d{3})(\d{3})(\d{4})/, "$1-$2-$3");
+
     try {
       const newUser = {
         firstName,
         lastName,
-        phone,
+        phone: formattedPhone,
         birth,
         email,
         password,
@@ -57,22 +96,22 @@ export default function Page() {
       };
 
       await axios.post("http://localhost:5000/user", newUser);
+      clearFormData();
+      setErrorMessage(""); // Clear the error message
       setMode(0);
     } catch (error) {
       setErrorMessage("An error occurred. Please try again later.");
     }
   };
 
-  return mode == 1 ? (
+  return mode === 1 ? (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-white to-gray-200 py-10">
       <div className="w-full max-w-md p-8 space-y-0 bg-white rounded-3xl shadow-2xl">
         <h2 className="text-3xl font-bold text-center text-slate-900 mb-6">Sign Up</h2>
         <form className="mt-6" onSubmit={handleSignUp}>
+          {/* First Name */}
           <div className="mb-4">
-            <label
-              htmlFor="firstName"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="firstName" className="block mb-2 text-sm font-medium text-gray-700">
               First name
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -88,11 +127,9 @@ export default function Page() {
             </div>
           </div>
 
+          {/* Last Name */}
           <div className="mb-4">
-            <label
-              htmlFor="lastName"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="lastName" className="block mb-2 text-sm font-medium text-gray-700">
               Last name
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -108,11 +145,9 @@ export default function Page() {
             </div>
           </div>
 
+          {/* Phone */}
           <div className="mb-4">
-            <label
-              htmlFor="phone"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="phone" className="block mb-2 text-sm font-medium text-gray-700">
               Phone
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -122,18 +157,15 @@ export default function Page() {
                 id="phone"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="Enter your phone"
+                placeholder="Enter your phone number (10 digits)"
                 className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
 
-          {/* Date Field */}
+          {/* Date of Birth */}
           <div className="mb-4">
-            <label
-              htmlFor="date"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-700">
               Date of Birth
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -148,12 +180,9 @@ export default function Page() {
             </div>
           </div>
 
-          {/* Rate Field */}
+          {/* Rate */}
           <div className="mb-4">
-            <label
-              htmlFor="rate"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="rate" className="block mb-2 text-sm font-medium text-gray-700">
               Rate
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -169,11 +198,9 @@ export default function Page() {
             </div>
           </div>
 
+          {/* Email */}
           <div className="mb-4">
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-700">
               Email
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -183,17 +210,15 @@ export default function Page() {
                 id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email"
+                placeholder="Enter your email (e.g., test@gmail.com)"
                 className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
           </div>
 
+          {/* Password */}
           <div className="mb-4">
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-medium text-gray-700">
               Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -209,11 +234,9 @@ export default function Page() {
             </div>
           </div>
 
+          {/* Confirm Password */}
           <div className="mb-4">
-            <label
-              htmlFor="confirmPassword"
-              className="block mb-2 text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="confirmPassword" className="block mb-2 text-sm font-medium text-gray-700">
               Confirm Password
             </label>
             <div className="flex items-center px-3 border border-gray-300 rounded-md shadow-sm">
@@ -221,7 +244,9 @@ export default function Page() {
               <input
                 type="password"
                 id="confirmPassword"
-                placeholder="Enter your confirm password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm your password"
                 className="w-full px-2 py-2 focus:outline-none focus:border-indigo-500 focus:ring-gray-700 rounded-md"
               />
             </div>
@@ -241,7 +266,7 @@ export default function Page() {
         <p className="mt-4 py-5 text-sm text-center">
           Already have an account?{" "}
           <span
-            onClick={(e) => setMode(0)}
+            onClick={() => setMode(0)}
             className="text-indigo-600 hover:underline cursor-pointer"
           >
             Sign In

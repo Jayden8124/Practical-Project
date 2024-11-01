@@ -21,6 +21,12 @@ const Profile = () => {
   const [showPasswordErrorPopup, setShowPasswordErrorPopup] = useState(false);
   const router = useRouter();
 
+  const clearFormData = () => {
+    setOldPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("authToken");
     const email = localStorage.getItem("userEmail");
@@ -148,14 +154,17 @@ const Profile = () => {
   };
 
   const handleCloseChangePasswordPopup = () => {
+    clearFormData();
     setShowChangePasswordPopup(false);
   };
 
   const handleClosePasswordSuccessPopup = () => {
+    clearFormData();
     setShowPasswordSuccessPopup(false);
   };
 
   const handleClosePasswordErrorPopup = () => {
+    clearFormData();
     setShowPasswordErrorPopup(false);
   };
 
