@@ -19,8 +19,6 @@ const Profile = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPasswordSuccessPopup, setShowPasswordSuccessPopup] = useState(false);
   const [showPasswordErrorPopup, setShowPasswordErrorPopup] = useState(false);
-  const [showPasswordAlertPopup, setShowPasswordAlertPopup] = useState(false);
-  const [passwordAlertMessage, setPasswordAlertMessage] = useState("");
   const router = useRouter();
 
   const clearFormData = () => {
@@ -130,22 +128,17 @@ const Profile = () => {
   const handleChangePassword = async () => {
     const email = localStorage.getItem("userEmail");
     if (!email || !oldPassword || !newPassword || !confirmPassword) {
-      setPasswordAlertMessage("Please fill in all the fields");
-      setShowPasswordAlertPopup(true);
+      alert("Please fill in all the fields");
       return;
     }
 
     if (!validatePassword(newPassword)) {
-      setPasswordAlertMessage(
-        "New password must be at least 8 characters long and include at least one uppercase letter and one number"
-      );
-      setShowPasswordAlertPopup(true);
+      alert("New password must be at least 8 characters long and include at least one uppercase letter and one number");
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setPasswordAlertMessage("New password and confirm password do not match");
-      setShowPasswordAlertPopup(true);
+      alert("New password and confirm password do not match");
       return;
     }
 
@@ -157,14 +150,12 @@ const Profile = () => {
       });
 
       if (response.status === 200) {
-        setPasswordAlertMessage("Your password has been updated successfully.");
-    setShowPasswordSuccessPopup(true);
+        setShowPasswordSuccessPopup(true);
         handleCloseChangePasswordPopup();
       }
     } catch (error) {
       console.error("Error updating password: ", error);
-      setPasswordAlertMessage("Failed to update password. Please check your old password and try again.");
-    setShowPasswordErrorPopup(true);
+      setShowPasswordErrorPopup(true);
     }
   };
 
@@ -185,10 +176,6 @@ const Profile = () => {
   const handleClosePasswordErrorPopup = () => {
     clearFormData();
     setShowPasswordErrorPopup(false);
-  };
-
-  const handleClosePasswordAlertPopup = () => {
-    setShowPasswordAlertPopup(false);
   };
 
   const handleEditImage = () => {
@@ -399,7 +386,8 @@ const Profile = () => {
             >
               &times;
             </button>
-            {passwordAlertMessage}
+            <h2 className="text-2xl font-bold mb-4">Password Updated</h2>
+            <p className="text-gray-600">Your password has been updated successfully.</p>
           </div>
         </div>
       )}
@@ -413,22 +401,8 @@ const Profile = () => {
             >
               &times;
             </button>
-            {passwordAlertMessage}
-          </div>
-        </div>
-      )}
-
-      {showPasswordAlertPopup && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg max-w-sm w-full text-center relative shadow-lg">
-            <button
-              onClick={handleClosePasswordAlertPopup}
-              className="absolute top-2 right-2 text-gray-600 hover:text-black"
-            >
-              &times;
-            </button>
-            <h2 className="text-2xl font-bold mb-4">Invalid Input</h2>
-            <p className="text-gray-600">{passwordAlertMessage}</p>
+            <h2 className="text-2xl font-bold mb-4">Password Update Failed</h2>
+            <p className="text-gray-600">Failed to update password. Please check your old password and try again.</p>
           </div>
         </div>
       )}
